@@ -1,5 +1,5 @@
 import * as genreService from '../services/genreService.js';
-import {ApiResponse } from '../utils/ApiResponse.js';
+import { ApiResponse } from '../utils/apiResponse.js';
 
 export const create = async (req, res, next) => {
   try {
