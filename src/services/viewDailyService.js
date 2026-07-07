@@ -1,4 +1,4 @@
-import StoryViewDaily from "../model/storyViewDaily.js";
+import StoryViewDaily from "../model/StoryViewDaily.js";
 import Story from "../model/Story.js";
 
 export async function increaseView(storyId) {
