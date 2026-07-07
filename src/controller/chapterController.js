@@ -1,7 +1,6 @@
 import asyncHandler from "../utils/method/asyncHandler.js";
 import * as chapterService from "../services/chapterService.js";
 import { ApiResponse } from "../utils/apiResponse.js";
-import { Home, ArrowLeft } from "lucide-react";
 
 export const addChapter = asyncHandler(async (req, res) => {
   try {
