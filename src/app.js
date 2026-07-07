@@ -22,6 +22,7 @@ app.use(
     origin: [
       "http://localhost:5173",
       "http://172.20.10.5:5173",
+      "https://webtruyenbyquoctoan.netlify.app"
     ],
     credentials: true,
   })
