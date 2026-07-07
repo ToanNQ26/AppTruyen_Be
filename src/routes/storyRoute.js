@@ -7,7 +7,6 @@ import {
   updateStory,
   uploadStoryCover,
   deleteStory,
-  incrementViews,
 } from "../controller/storyController.js";
 
 
@@ -18,7 +17,6 @@ router.get("/:slug", getStoryBySlug);
 router.post("/", createStory);
 router.put("/:id", updateStory);
 router.delete("/:id", deleteStory);
-router.patch("/:id/views", incrementViews);
 
 router.post("/:id/cover", upload.single("cover"), uploadStoryCover);
 

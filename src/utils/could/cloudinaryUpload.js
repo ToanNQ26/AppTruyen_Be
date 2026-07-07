@@ -1,5 +1,7 @@
 // src/utils/cloudinaryUpload.js
 import cloudinary from "../../config/cloudinary.js";
+import { Readable } from "stream";
+
 
 export const uploadImage = async (filePath,storyName) => {
   const folderPath = `truyen-tranh/${sanitizeFolderName(storyName)}/cover`;
@@ -13,6 +15,27 @@ export const uploadImage = async (filePath,storyName) => {
   return res.secure_url;
 };
 
+export const uploadImageRAM = (buffer, storyName) => {
+  const folderPath = `truyen-tranh/${sanitizeFolderName(storyName)}/cover`;
+  const publicId = "cover";
+
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      {
+        folder: folderPath,
+        public_id: publicId,
+        overwrite: true,
+      },
+      (error, result) => {
+        if (error) return reject(error);
+        resolve(result.secure_url);
+      }
+    );
+
+    Readable.from(buffer).pipe(stream);
+  });
+};
+
 // export const deleteImage = async (storyId) => {
 //   try {
 //     const res = await cloudinary.uploader.destroy(`truyen-tranh/${storyId}`);
@@ -23,7 +46,7 @@ export const uploadImage = async (filePath,storyName) => {
 //   }
 // };
 
-export const uploadChapterImage = async (filePath, storyName, chapterNumber) => {
+export const uploadChapterImageSSD = async (filePath, storyName, chapterNumber) => {
   const folderPath = `truyen-tranh/${sanitizeFolderName(storyName)}/chapter-${chapterNumber}`;
   
   const res = await cloudinary.uploader.upload(filePath, {
@@ -31,6 +54,26 @@ export const uploadChapterImage = async (filePath, storyName, chapterNumber) => 
   });
 
   return res.secure_url;
+};
+
+export const uploadChapterImageRAM = (buffer, storyName, chapterNumber) => {
+  const folderPath = `truyen-tranh/${sanitizeFolderName(
+    storyName
+  )}/chapter-${chapterNumber}`;
+
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      {
+        folder: folderPath,
+      },
+      (error, result) => {
+        if (error) return reject(error);
+        resolve(result.secure_url);
+      }
+    );
+
+    Readable.from(buffer).pipe(stream);
+  });
 };
 
 function sanitizeFolderName(name) {

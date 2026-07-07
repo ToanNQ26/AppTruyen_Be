@@ -1,39 +1,72 @@
 import Story from "../model/Story.js";
 import Genre from "../model/Genre.js";
 import { isValidObjectId } from "../utils/validateObjectId.js";
-import fs from 'fs/promises';
 import path from 'path';
 import { safeDeleteFile } from "../utils/file.js";
 import { AppError } from "../utils/exeption/AppError.js";
 import { ErrorCode } from "../utils/exeption/ErrorCode.js";
-import { uploadImage } from "../utils/could/cloudinaryUpload.js";
+import { uploadImageRAM } from "../utils/could/cloudinaryUpload.js";
+import { increaseView } from "./viewDailyService.js";
 
 export async function listStories(queryParams) {
-  const page = Number(queryParams.page) || 1;
-  const limit = Number(queryParams.limit) || 20;
-  const sort = queryParams.sort || '-updatedAt';
+  const page = Math.max(1, Number(queryParams.page) || 1);
+  const limit = Math.max(1, Number(queryParams.limit) || 12);
 
+  const sortMap = {
+    newest: "-createdAt",
+    oldest: "createdAt",
+    views: "-views",
+    followers: "-followersCount",
+    updated: "-updatedAt",
+  };
+
+  const sort = sortMap[queryParams.sort] || "-updatedAt";
   const query = {};
 
-  if (queryParams.storyType) query.storyType = queryParams.storyType;
-  if (queryParams.status) query.status = queryParams.status;
+  if (queryParams.storyType) {
+    query.storyType = queryParams.storyType;
+  }
+
+  if (queryParams.status) {
+    query.status = queryParams.status;
+  }
+
   if (queryParams.isColor !== undefined) {
-    query.isColor = queryParams.isColor === 'true';
+    query.isColor = queryParams.isColor === "true";
   }
+
   if (queryParams.genres) {
-    query.genres = { $in: queryParams.genres.split(',') };
+    const genreIds = queryParams.genres
+      .split(",")
+      .filter(Boolean);
+
+    query.genres = {
+      $in: genreIds
+    };
   }
+
   if (queryParams.search) {
-    query.$text = { $search: queryParams.search };
+    const keyword = queryParams.search.trim();
+
+    if (keyword) {
+      query.$or = [
+        { title: { $regex: keyword, $options: "i" } }
+      ];
+
+      if (keyword.length >= 6) {
+        query.$text = { $search: keyword };
+      }
+    }
   }
 
   const total = await Story.countDocuments(query);
 
   const stories = await Story.find(query)
-    .populate('genres', 'name')
+    .populate("genres", "name")
     .sort(sort)
     .skip((page - 1) * limit)
-    .limit(limit);
+    .limit(limit)
+    .lean();
 
   return {
     total,
@@ -82,10 +115,6 @@ export async function deleteStory(id) {
   return deleted;
 }
 
-export async function incrementViews(id) {
-  return Story.findByIdAndUpdate(id, { $inc: { views: 1 } }, { new: true });
-}
-
 export const uploadCover = async (storyId, file) => {
   try {
     if (!file) {
@@ -93,22 +122,18 @@ export const uploadCover = async (storyId, file) => {
     }
 
     if (!isValidObjectId(storyId)) {
-      await fs.unlink(file.path); // xóa file tạm nếu storyId sai
       throw new AppError(ErrorCode.INVALID_KEY);
     }
 
     const story = await Story.findById(storyId);
     console.log(story.title);
     if (!story) {
-      await fs.unlink(file.path); // xóa file tạm nếu không tìm thấy story
       throw new AppError(ErrorCode.STORY_NOT_EXISTED);
     }
 
     // Upload lên Cloudinary
-    const imageUrl = await uploadImage(file.path, story.title);
+    const imageUrl = await uploadImageRAM(file.buffer, story.title);
 
-    // Xóa file ảnh tạm sau khi đã upload lên cloudinary
-    await fs.unlink(file.path);
 
     // Lưu đường dẫn mới vào story
     story.coverUrl = imageUrl;
@@ -116,13 +141,6 @@ export const uploadCover = async (storyId, file) => {
 
     return story;
   } catch (err) {
-    // Nếu có lỗi, xóa file tạm nếu tồn tại
-    if (file?.path) {
-      try {
-        await fs.unlink(file.path);
-      } catch (_) {}
-    }
-
    throw err;
   }
 };

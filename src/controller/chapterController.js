@@ -1,6 +1,7 @@
 import asyncHandler from "../utils/method/asyncHandler.js";
 import * as chapterService from "../services/chapterService.js";
 import { ApiResponse } from "../utils/apiResponse.js";
+import { Home, ArrowLeft } from "lucide-react";
 
 export const addChapter = asyncHandler(async (req, res) => {
   try {
@@ -16,8 +17,18 @@ export const addChapter = asyncHandler(async (req, res) => {
   }
 });
 
-export const getChaptersByStoryId = asyncHandler(async (req, res) => {
-  const chapter = await chapterService.getChaptersByStoryId(req.params.id);
+export const getListChapter = asyncHandler(async (req, res) => {
+  const chapter = await chapterService.getListChapter(req.params.id);
+  return res.json(
+    new ApiResponse({
+      result: chapter,
+    })
+  );
+});
+
+export const getChapter = asyncHandler (async (req, res) => {
+  const {slug,chapterNumber} = req.params;
+  const chapter = await chapterService.getChapter(slug, chapterNumber);
   return res.json(
     new ApiResponse({
       result: chapter,

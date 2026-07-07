@@ -1,8 +1,21 @@
-import User from "../model/user.js";
+import User from "../model/User.js";
 import bcrypt from "bcryptjs";
 import { hashPassword, comparePassword } from "../utils/hash.js";
 import { AppError } from "../utils/exeption/AppError.js";
 import { ErrorCode } from "../utils/exeption/ErrorCode.js";
+
+
+
+export const updateRole = async (userId, role) => {
+  const user = await User.findById(userId);
+
+  if (!user) {
+    throw new AppError(ErrorCode.USER_NOT_EXISTED);
+  }
+  user.role = role;
+  await user.save();
+  return user;
+};
 
 export const createUser = async ({ name, email, password }) => {
   const hashedPassword = await hashPassword(password);
@@ -14,11 +27,14 @@ export const getAllUsers = async () => {
   return await User.find().select("-password");
 };
 
-export const getUserById = async (id) => {
+export const getUserById = async ( id) => {
+
   const user = await User.findById(id).select("-password");
   if (!user) throw new AppError(ErrorCode.USER_NOT_EXISTED);
   return user;
 };
+
+
 
 export const deleteUserById = async (id) => {
   const user = await User.findByIdAndDelete(id);
@@ -43,7 +59,7 @@ export const updatePassword = async ({ email, oldPassword, password }) => {
   const user = await User.findOne({ email });
 
   if (!email || !password || !oldPassword) {
-    return res.status(400).json({ message: "Email và password là bắt buộc." });
+    throw new AppError(ErrorCode.EMPTY_FIELD);
   }
 
   if (!user) {

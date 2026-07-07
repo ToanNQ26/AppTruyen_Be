@@ -23,7 +23,7 @@ export const createUser = asyncHandler(async (req, res) => {
 });
 
 export const getUserById = asyncHandler(async (req, res) => {
-  const user = await userService.getUserById(req.params.id);
+  const user = await userService.getUserById(req.user.id);
 
   return res.json(
     new ApiResponse({
@@ -59,3 +59,17 @@ export const updatePassword = asyncHandler(async (req, res) => {
 
   return res.json(new ApiResponse({}));
 });
+
+export const updateRole = async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    const { role } = req.body;
+    const user = await userService.updateRole(
+      userId,
+      role
+    );
+    res.json(new ApiResponse({ result: user , message: "Update role successfully!"}));
+  } catch (error) {
+    next(error);
+  }
+};

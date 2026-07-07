@@ -63,7 +63,3 @@ export const uploadStoryCover = asyncHandler(async (req, res) => {
   }));
 });
 
-export const incrementViews = asyncHandler(async (req,res) => {
-  await storiesService.incrementViews(req.params.id);
-  return res.sendStatus(204);
-})

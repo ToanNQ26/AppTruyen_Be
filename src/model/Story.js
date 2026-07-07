@@ -19,12 +19,16 @@ const storySchema = new mongoose.Schema(
 
     status:  { type: String, enum: ['ongoing', 'completed', 'hiatus'], default: 'ongoing' },
     genres:  [{ type: mongoose.Schema.Types.ObjectId, ref: 'Genre', default: [] }],
-    tags:    [{ type: String, lowercase: true , default: []}],
-    views:   { type: Number, default: 0, min: 0 }
+    tags:    [{ type: String, lowercase: true , trim: true, default: []}],
+    views:   { type: Number, default: 0, min: 0 },
+    commentCount: { type: Number, default: 0 },
+    followersCount: { type: Number, default: 0, min: 0 }
   },
   { timestamps: true }
 );
 
+storySchema.index({ views: -1 });
+storySchema.index({ genres: 1, status: 1, views: -1 });
 storySchema.index({ title: 'text' });
 storySchema.index({ storyType: 1, status: 1 });
 storySchema.index({ genres: 1 });

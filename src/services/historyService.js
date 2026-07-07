@@ -2,7 +2,7 @@ import History from '../model/History.js';
 
 export const getAllHistories = async (userId) => {
   return await History.find({ user: userId })
-    .populate('story', 'title coverUrl')
+    .populate('story', 'title coverUrl slug')
     .populate('chapter', 'title chapterNumber')
     .sort({ lastReadAt: -1 });
 };

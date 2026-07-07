@@ -9,7 +9,7 @@ export const CommentController = {
       const comment = await CommentService.create({ userId, storyId, chapterId, content });
       return res.json(
             new ApiResponse({
-              result: chapter,
+              result: comment,
             })
           );
     } catch (err) {
@@ -21,7 +21,11 @@ export const CommentController = {
     try {
       const { storyId, chapterId } = req.query;
       const comments = await CommentService.getAll({ storyId, chapterId });
-      res.json(comments);
+      res.json(
+        new ApiResponse({
+          result: comments,
+        })
+      );
     } catch (err) {
       res.status(400).json({ message: err.message });
     }
@@ -31,7 +35,7 @@ export const CommentController = {
     try {
       const comment = await CommentService.getById(req.params.id);
       if (!comment) return res.status(404).json({ message: 'Không tìm thấy bình luận' });
-      res.json(comment);
+      res.json(new ApiResponse({ result: comment }));
     } catch (err) {
       res.status(400).json({ message: err.message });
     }
@@ -41,7 +45,7 @@ export const CommentController = {
     try {
       const { content } = req.body;
       const comment = await CommentService.update(req.params.id, req.user.id, content);
-      res.json(comment);
+      res.json(new ApiResponse({ result: comment }));
     } catch (err) {
       res.status(400).json({ message: err.message });
     }
@@ -50,7 +54,7 @@ export const CommentController = {
   async delete(req, res) {
     try {
       const result = await CommentService.delete(req.params.id, req.user.id);
-      res.json(result);
+      res.json(new ApiResponse({ result }));
     } catch (err) {
       res.status(400).json({ message: err.message });
     }

@@ -21,3 +21,13 @@ export const verifyToken = (req, res, next) => {
     return next(new AppError(ErrorCode.INVALID_KEY));
   }
 };
+
+export const authorize = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return next(new AppError(ErrorCode.FORBIDDEN));
+    }
+
+    next();
+  };
+};
