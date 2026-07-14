@@ -13,7 +13,6 @@ router.get('/me', getUserById);
 router.delete('/:id',authorize('admin'), deleteUserById);
 router.put('/me', updateUser);
 router.put('/password', updatePassword);
-// router.get('/me', getMe);
 router.patch('/role',authorize('admin'), updateRole);
 
 export default router; 

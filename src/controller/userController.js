@@ -43,7 +43,9 @@ export const deleteUserById = asyncHandler(async (req, res) => {
 });
 
 export const updateUser = asyncHandler(async (req, res) => {
-  const updateUser = await userService.updateUser(req.body);
+  const userId = req.user.id;
+  const updateUser = await userService.updateUser(userId,req.body);
+  
 
   return res.json(
     new ApiResponse({
@@ -53,9 +55,10 @@ export const updateUser = asyncHandler(async (req, res) => {
 });
 
 export const updatePassword = asyncHandler(async (req, res) => {
-  const { email, oldPassword, password } = req.body;
+  const userId = req.user.id;
+  const { currentPassword, newPassword } = req.body;
 
-  await userService.updatePassword({ email, oldPassword, password });
+  await userService.updatePassword( userId,{currentPassword, newPassword });
 
   return res.json(new ApiResponse({}));
 });

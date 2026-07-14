@@ -42,23 +42,25 @@ export const deleteUserById = async (id) => {
   return user;
 };
 
-export const updateUser = async ({ id, name, email }) => {
-  const updateData = { name, email };
-
+export const updateUser = async (id,data) => {
+  const updateData = { 
+    name: data.name,
+    email: data.email 
+  };
   const updateUser = await User.findByIdAndUpdate(id, updateData, {
     new: true,
     runValidators: true,
-  });
+  }).select("-password -role");
 
   if (!updateUser) throw new AppError(ErrorCode.USER_NOT_EXISTED);
 
   return updateUser;
 };
 
-export const updatePassword = async ({ email, oldPassword, password }) => {
-  const user = await User.findOne({ email });
+export const updatePassword = async (id,{currentPassword,newPassword}) => {
+  const user = await User.findById(id);
 
-  if (!email || !password || !oldPassword) {
+  if ( !currentPassword || !newPassword) {
     throw new AppError(ErrorCode.EMPTY_FIELD);
   }
 
@@ -66,12 +68,12 @@ export const updatePassword = async ({ email, oldPassword, password }) => {
     throw new AppError(ErrorCode.USER_NOT_EXISTED);
   }
 
-  const isAuthenticated = await comparePassword(oldPassword, user.password);
+  const isAuthenticated = await comparePassword(currentPassword, user.password);
   if (!isAuthenticated) {
     throw new AppError(ErrorCode.UNAUTHENTICATED);
   }
 
-  const hashedPassword = await hashPassword(password);
+  const hashedPassword = await hashPassword(newPassword);
   user.password = hashedPassword;
 
   await user.save();
