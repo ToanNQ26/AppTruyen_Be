@@ -4,11 +4,19 @@ import { ApiResponse } from "../utils/apiResponse.js";
 
 // GET /api/users
 export const getAllUsers = asyncHandler(async (req, res) => {
-  const users = await userService.getAllUsers();
+  const { page = 1, limit = 10, search = "", role = "" } = req.query;
+
+  const result = await userService.getAllUsers({
+    page: Number(page),
+    limit: Number(limit),
+    search,
+    role,
+  });
+
   return res.json(
     new ApiResponse({
-      result: users,
-    })
+      result: result,
+    }),
   );
 });
 
@@ -18,7 +26,7 @@ export const createUser = asyncHandler(async (req, res) => {
   return res.json(
     new ApiResponse({
       result: user,
-    })
+    }),
   );
 });
 
@@ -28,7 +36,7 @@ export const getUserById = asyncHandler(async (req, res) => {
   return res.json(
     new ApiResponse({
       result: user,
-    })
+    }),
   );
 });
 
@@ -38,19 +46,18 @@ export const deleteUserById = asyncHandler(async (req, res) => {
   return res.json(
     new ApiResponse({
       result: user,
-    })
+    }),
   );
 });
 
 export const updateUser = asyncHandler(async (req, res) => {
   const userId = req.user.id;
-  const updateUser = await userService.updateUser(userId,req.body);
-  
+  const updateUser = await userService.updateUser(userId, req.body);
 
   return res.json(
     new ApiResponse({
       result: updateUser,
-    })
+    }),
   );
 });
 
@@ -58,7 +65,7 @@ export const updatePassword = asyncHandler(async (req, res) => {
   const userId = req.user.id;
   const { currentPassword, newPassword } = req.body;
 
-  await userService.updatePassword( userId,{currentPassword, newPassword });
+  await userService.updatePassword(userId, { currentPassword, newPassword });
 
   return res.json(new ApiResponse({}));
 });
@@ -67,11 +74,10 @@ export const updateRole = async (req, res, next) => {
   try {
     const { userId } = req.params;
     const { role } = req.body;
-    const user = await userService.updateRole(
-      userId,
-      role
+    const user = await userService.updateRole(userId, role);
+    res.json(
+      new ApiResponse({ result: user, message: "Update role successfully!" }),
     );
-    res.json(new ApiResponse({ result: user , message: "Update role successfully!"}));
   } catch (error) {
     next(error);
   }

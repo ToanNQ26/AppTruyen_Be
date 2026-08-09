@@ -44,8 +44,8 @@ import { isValidObjectId } from "../utils/validateObjectId.js";
 
 // upload trong ram
 export async function addChapter(data, files) {
-    const { story, chapterNumber, title } = data;
-    const storyCheck = await Story.findById(data.story);
+    const {  storyId, chapterNumber, title } = data;
+    const storyCheck = await Story.findById(data.storyId);
     if (!storyCheck) throw new AppError(ErrorCode.STORY_NOT_EXISTED);
 
     const uploadPromises = files.map(async (file) => {
@@ -59,7 +59,7 @@ export async function addChapter(data, files) {
     const imageUrls = await Promise.all(uploadPromises);
     // 3. Tạo chương
     const chapter = await Chapter.create({
-      story: story,
+      story: storyId,
       chapterNumber: Number(chapterNumber),
       title: data.title,
       images: imageUrls,

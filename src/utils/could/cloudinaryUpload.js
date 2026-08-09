@@ -104,3 +104,19 @@ export const deleteFolderFromCloudinary = async (storyTitle, chapterNumber) => {
     throw new Error('Failed to delete folder from Cloudinary: ' + error.message);
   }
 };
+
+export const deleteStoryCover = async (storyName) => {
+  const folderPath = `truyen-tranh/${sanitizeFolderName(storyName)}/cover`;
+
+  try {
+    const result = await cloudinary.uploader.destroy(
+      `${folderPath}/cover`
+    );
+
+    return result;
+  } catch (error) {
+    throw new Error(
+      `Failed to delete story cover from Cloudinary: ${error.message}`
+    );
+  }
+};

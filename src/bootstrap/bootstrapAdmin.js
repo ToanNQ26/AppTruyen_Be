@@ -1,7 +1,7 @@
 // bootstrapAdmin.js
 
 import User from '../model/User.js';
-import { hashPassword } from "../utils/hash.js";
+import { hash } from "../utils/hash.js";
 
 export const bootstrapAdmin = async () => {
   const admin = await User.findOne({
@@ -12,7 +12,7 @@ export const bootstrapAdmin = async () => {
     return;
   }
 
-  const hashedPassword = await hashPassword(process.env.ADMIN_PASSWORD);
+  const hashedPassword = await hash(process.env.ADMIN_PASSWORD);
 
 
   await User.create({

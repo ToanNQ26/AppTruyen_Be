@@ -11,6 +11,8 @@ export const ErrorCode = {
   UNAUTHENTICATED: { code: 1100, httpStatus: 401, message: "Unauthenticated" },
   PASSWORD_INCORRECT: { code: 1101, httpStatus: 401, message: "Password incorrect!" },
   TOKEN_EXPIRED: { code: 1102, httpStatus: 401, message: "Token has expired" },
+  TOKEN_NOT_EXIST: { code: 1103, httpStatus: 401, message: "Token not exits" },
+  REFRESH_TOKEN_EXPIRED: { code: 1104, httpStatus: 401, message: "Refresh token has expired" },
 
   FORBIDDEN: { code: 1200, httpStatus: 403, message: "Forbidden" },
 

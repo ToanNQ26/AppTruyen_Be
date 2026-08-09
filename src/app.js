@@ -13,6 +13,9 @@ import commentRoute from "./routes/commentRoute.js";
 import followRoute from "./routes/followRoute.js";
 import viewDailyRouter from "./routes/viewDailyRouter.js"
 import cors from "cors";
+import cookieParser from "cookie-parser";
+import contributorRouter from "./routes/contributorApplication.js";
+import adminRoute from "./routes/adminRoute.js";
 
 const app = express();
 
@@ -30,6 +33,7 @@ app.use(
 
 app.use(morgan("dev"));
 app.use(express.json());
+app.use(cookieParser());
 
 app.use("/uploads", express.static("uploads"));
 app.use("/api/users", userRoute);
@@ -43,6 +47,8 @@ app.use("/rate", rateRoute);
 app.use('/comments', commentRoute);
 app.use('/follows', followRoute);
 app.use("/views", viewDailyRouter);
+app.use('/contributor-applications',contributorRouter);
+app.use("/admin", adminRoute);
 // Xử lý lỗi
 app.use(errorHandler);
 app.use((req, res) =>

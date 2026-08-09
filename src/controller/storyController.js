@@ -23,14 +23,24 @@ export const getStoryBySlug = asyncHandler(async (req, res) => {
 });
 
 //tạo truyện
-export const createStory = asyncHandler(async (req, res) => {
-  const story = await storiesService.createStory(req.body);
-  return res.json(
+
+export const createStory = async (req, res, next) => {
+  try {
+    const story = await storiesService.createStory({
+      userId: req.user.id,
+      storyData: req.body,
+      coverFile: req.file,
+    });
+
+    return res.json(
     new ApiResponse({
       result: story,
     })
   );
-});
+  } catch (error) {
+    next(error);
+  }
+};
 
 //update truyện
 export const updateStory = asyncHandler(async (req, res) => {
@@ -61,5 +71,18 @@ export const uploadStoryCover = asyncHandler(async (req, res) => {
     message: 'Cập nhật ảnh bìa thành công',
     data: updatedStory, // Gợi ý trả về thông tin story đã cập nhật
   }));
+});
+
+export const getMyStories = asyncHandler(async (req, res) => {
+  const result = await storiesService.getMyStories(
+    req.user.id,
+    req.query
+  );
+
+  return res.json(
+    new ApiResponse({
+      result,
+    })
+  );
 });
 

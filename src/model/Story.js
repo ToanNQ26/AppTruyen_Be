@@ -22,7 +22,8 @@ const storySchema = new mongoose.Schema(
     tags:    [{ type: String, lowercase: true , trim: true, default: []}],
     views:   { type: Number, default: 0, min: 0 },
     commentCount: { type: Number, default: 0 },
-    followersCount: { type: Number, default: 0, min: 0 }
+    followersCount: { type: Number, default: 0, min: 0 },
+    createdBy: {type: mongoose.Schema.Types.ObjectId, ref: 'User', default: '6a295a72836eb8b45695915a' }
   },
   { timestamps: true }
 );

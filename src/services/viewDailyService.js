@@ -13,7 +13,7 @@ export async function increaseView(storyId) {
       },
       {
         new: true,
-      }
+      },
     ),
 
     StoryViewDaily.findOneAndUpdate(
@@ -29,7 +29,7 @@ export async function increaseView(storyId) {
       {
         upsert: true,
         new: true,
-      }
+      },
     ),
   ]);
 }
@@ -64,9 +64,9 @@ export async function getTopDaily(limit = 10) {
       $unwind: "$story",
     },
     {
-       $replaceRoot: {
-        newRoot: "$story"
-      }
+      $replaceRoot: {
+        newRoot: "$story",
+      },
     },
   ]);
 }
@@ -84,15 +84,15 @@ export async function getTopWeekly(limit = 10) {
   return StoryViewDaily.aggregate([
     {
       $match: {
-        date: { $gte: startDate, $lte: endDate }
-      }
+        date: { $gte: startDate, $lte: endDate },
+      },
     },
 
     {
       $group: {
         _id: "$storyId",
-        viewsmonth: { $sum: "$views" }
-      }
+        viewsmonth: { $sum: "$views" },
+      },
     },
 
     {
@@ -100,8 +100,8 @@ export async function getTopWeekly(limit = 10) {
         from: "stories",
         localField: "_id",
         foreignField: "_id",
-        as: "story"
-      }
+        as: "story",
+      },
     },
 
     { $unwind: "$story" },
@@ -119,19 +119,19 @@ export async function getTopWeekly(limit = 10) {
         views: "$story.views",
         followersCount: "$story.followersCount",
         description: "$story.description",
-      }
+      },
     },
 
     // 👉 sort theo MONTHLY views (vẫn là views của group)
     {
       $sort: {
         viewsmonth: -1,
-      }
+      },
     },
 
     {
-      $limit: limit
-    }
+      $limit: limit,
+    },
   ]);
 }
 
@@ -148,15 +148,15 @@ export async function getTopMonthly(limit = 10) {
   return StoryViewDaily.aggregate([
     {
       $match: {
-        date: { $gte: startDate, $lte: endDate }
-      }
+        date: { $gte: startDate, $lte: endDate },
+      },
     },
 
     {
       $group: {
         _id: "$storyId",
-        viewsmonth: { $sum: "$views" }
-      }
+        viewsmonth: { $sum: "$views" },
+      },
     },
 
     {
@@ -164,8 +164,8 @@ export async function getTopMonthly(limit = 10) {
         from: "stories",
         localField: "_id",
         foreignField: "_id",
-        as: "story"
-      }
+        as: "story",
+      },
     },
 
     { $unwind: "$story" },
@@ -183,18 +183,66 @@ export async function getTopMonthly(limit = 10) {
         views: "$story.views",
         followersCount: "$story.followersCount",
         description: "$story.description",
-      }
+      },
     },
 
     // 👉 sort theo MONTHLY views (vẫn là views của group)
     {
       $sort: {
         viewsmonth: -1,
-      }
+      },
     },
 
     {
-      $limit: limit
-    }
+      $limit: limit,
+    },
   ]);
 }
+
+export const getWeeklyStats = async () => {
+  const startDate = new Date();
+
+  startDate.setDate(startDate.getDate() - 6);
+  startDate.setHours(0, 0, 0, 0);
+
+  const stats = await StoryViewDaily.aggregate([
+    {
+      $match: {
+        date: {
+          $gte: startDate,
+        },
+      },
+    },
+
+    {
+      $group: {
+        _id: {
+          $dateToString: {
+            format: "%Y-%m-%d",
+            date: "$date",
+          },
+        },
+
+        count: {
+          $sum: "$views",
+        },
+      },
+    },
+
+    {
+      $project: {
+        _id: 0,
+        date: "$_id",
+        count: 1,
+      },
+    },
+
+    {
+      $sort: {
+        date: 1,
+      },
+    },
+  ]);
+
+  return stats;
+};

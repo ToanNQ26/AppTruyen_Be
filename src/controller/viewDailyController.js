@@ -66,3 +66,4 @@ export async function getTopMonthly(req, res, next) {
     next(error);
   }
 }
+
