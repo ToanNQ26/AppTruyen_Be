@@ -8,7 +8,7 @@ export const login = asyncHandler(async (req, res) => {
 
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
-    secure: true,
+    secure: fasle,
     sameSite: "none",
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
@@ -23,7 +23,7 @@ export const refeshverify = async(req,res) => {
   const { accessToken, refreshtoken: newRefreshToken  } = await authService.refresh(refreshToken);
   res.cookie("refreshToken", newRefreshToken, {
     httpOnly: true,
-    secure: true,
+    secure: false,
     sameSite: "none",
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
