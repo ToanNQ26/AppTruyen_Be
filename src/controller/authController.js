@@ -8,8 +8,8 @@ export const login = asyncHandler(async (req, res) => {
 
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
-    secure: fasle,
-    sameSite: "none",
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
   res.json(new ApiResponse({
@@ -23,8 +23,8 @@ export const refeshverify = async(req,res) => {
   const { accessToken, refreshtoken: newRefreshToken  } = await authService.refresh(refreshToken);
   res.cookie("refreshToken", newRefreshToken, {
     httpOnly: true,
-    secure: false,
-    sameSite: "none",
+    secure: process.env.NODE_ENV === "production" ,
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 
